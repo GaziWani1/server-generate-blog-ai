@@ -7,14 +7,15 @@ import { availableParallelism } from 'node:os';
 import userRouter from './route/user.route.js';
 const app = express();
 
+connectDb();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 const numCPUs = availableParallelism();
+
+app.use('/api/v1/users', userRouter);
 app.use(errorMiddleware);
-
-app.use('api/v1/user', userRouter);
-
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
 
@@ -27,11 +28,7 @@ if (cluster.isPrimary) {
     console.log(`worker ${worker.process.pid} died`);
   });
 } else {
-  connectDb()
-    .then(() =>
-      app.listen(PORT, () => {
-        console.log(`App is Running on Port http://localhost:${PORT}`);
-      })
-    )
-    .catch(() => process.exit(1));
+  app.listen(PORT, () => {
+    console.log(`App is Running on Port http://localhost:${PORT}`);
+  });
 }

@@ -3,6 +3,6 @@ import { signIn } from '../controller/user.controller.js';
 
 const userRouter = Router();
 
-userRouter.get('/signin', signIn);
+userRouter.post('/sign-in', signIn);
 
 export default userRouter;
