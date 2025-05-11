@@ -9,9 +9,11 @@ export const signIn = async (req, res, next) => {
   try {
     req.token = token;
     const user = await jwt.decode(token);
-    const userExist = await userModel.find({
+
+    const userExist = await userModel.findOne({
       googleId: user.sub,
     });
+
     if (userExist) {
       return res.status(200).json({
         user: userExist,
@@ -24,6 +26,7 @@ export const signIn = async (req, res, next) => {
       googleId: user.sub,
       email: user.email,
     });
+
     await newUser.save();
 
     return res

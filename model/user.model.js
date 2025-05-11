@@ -1,41 +1,37 @@
-import mongoose, { Schema, model } from 'mongoose';
-import bcrypt from 'bcrypt';
-const userSchema = new Schema(
+import mongoose, { model } from 'mongoose';
+
+const story = new mongoose.Schema(
   {
-    name: {
+    category: {
       type: String,
-      required: [true, 'Name is required'],
-      trim: true,
+      required: true,
+      index: true,
     },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-      lowercase: true,
-      match: [/\S+@\S+\.\S+/, 'Email is invalid'],
-    },
-    googleId: {
+    duration: {
       type: String,
       required: true,
     },
-    subscription: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Subscription',
+    story: {
+      type: String,
+      required: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
+    description: {
+      type: String,
+      required: true,
+    },
+    timeUnit: {
+      type: String,
+      required: true,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      index: true, // also indexed for faster lookups by creator
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
+story.index({ title: 1, createdBy: 1 });
 
-export default model('User', userSchema);
+export default model('Story', story);
