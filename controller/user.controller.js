@@ -15,6 +15,7 @@ export const signIn = async (req, res, next) => {
     });
 
     if (userExist) {
+      req.user = userExist;
       return res.status(200).json({
         user: userExist,
         token,
@@ -28,6 +29,7 @@ export const signIn = async (req, res, next) => {
     });
 
     await newUser.save();
+    req.user = newUser;
 
     return res
       .status(200)

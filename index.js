@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 const numCPUs = availableParallelism();
 
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/story', storyRouter);
+app.use('/api/v1/blog', storyRouter);
 
 app.use(errorMiddleware);
 if (cluster.isPrimary) {

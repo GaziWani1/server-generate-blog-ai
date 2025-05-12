@@ -1,46 +1,120 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { API_KEY } from '../config/env.js';
-import storyModel from '../model/story.model.js';
+import blogModel from '../model/blog.model.js';
 
 export const genAI = new GoogleGenerativeAI(API_KEY);
 export const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-export const createStory = async (req, res) => {
+export const createBlog = async (req, res) => {
   try {
-    const { storyType, duration, storyAbout, timeUnit } = req.body;
+    const { blogType, readingTime, blogAbout, timeUnit } = req.body;
 
-    if (duration > 15 && timeUnit === 'minute') {
-      throw new Error('Story Duration Should Be Only for 15 Mins Or Less');
-    }
-    if (!storyType || !duration || !storyAbout) {
-      return res
-        .status(400)
-        .json({ error: 'storyType, duration, and storyAbout are required' });
+    if (readingTime > 15 && timeUnit === 'minute') {
+      throw new Error(
+        'Blog Reading Time Should Be Only for 15 Minutes Or Less'
+      );
     }
 
-    let prompt = `Write a complete ${storyType} story in plain text that would take about ${duration} ${timeUnit} to read. The story should be about ${storyAbout}. Avoid any formatting or explanations — just give the story itself.`;
+    if (!blogType || !readingTime || !blogAbout) {
+      return res.status(400).json({
+        error:
+          'blogType, readingTime, blogAbout, and blogCategory are required',
+      });
+    }
 
+    let prompt = `Write a detailed, well-structured, and engaging ${blogType} blog post titled "${blogAbout}". The content should be formatted in Markdown using a README-style layout, with clear sections, headings (e.g., #, ##, ###), bullet points, blockquotes, bold/italic highlights, and to ensure readability.
+
+The blog should take approximately ${readingTime} ${timeUnit} to read. Start with a compelling title and a concise description, followed by a strong introduction. Then break the main body into logically organized sections with subheadings. Each section should have for readability, and include highlights like:
+- Lists for key points
+- Quotes for emphasis
+- Bold/italic for important terms
+
+End with a thoughtful and inspiring conclusion. Use line breaks between each major section and paragraph. The tone should be professional yet friendly, avoiding technical jargon unless necessary, and keeping it accessible for a broad audience. Prioritize clarity, creativity, and usefulness. don't include 'markdown' word in starting or any other place`;
+
+    // Generate the blog content using the model
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
-    const story = new storyModel({
-      category: storyAbout,
-      duration,
-      title: storyAbout,
+    // Saving the generated blog to the database
+    const blog = new blogModel({
+      readingTime,
+      title: blogAbout,
+      category: blogType,
       timeUnit,
-      story: text,
+      blog: text,
       createdBy: req.user._id,
     });
 
-    await story.save();
+    await blog.save();
 
     return res.json({
-      data: story,
-      message: 'Story Is Generated Successfully',
+      data: blog,
+      message: 'Blog Generated Successfully!',
     });
   } catch (error) {
-    console.error('Error generating story:', error);
-    res.status(500).json({ error: 'Failed to create story' });
+    console.error('Error generating blog:', error);
+    return res.status(500).json({ error: 'Failed to create blog' });
+  }
+};
+
+export const getUserBlogs = async (req, res) => {
+  try {
+    // parse pagination params from querystring, with defaults
+    const search = req.query.search;
+    const page = parseInt(req.query.page, 8) || 1;
+    const limit = parseInt(req.query.limit, 8) || 8;
+    const skip = (page - 1) * limit;
+
+    // base filter
+    const filter = { createdBy: req.user._id };
+
+    // if search is provided, add regex filter for title or other fields
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } }, // case-insensitive search
+        // { content: { $regex: search, $options: 'i' } }, // optionally add more fields
+      ];
+    }
+
+    // run both queries in parallel
+    const [totalItems, userBlogs] = await Promise.all([
+      blogModel.countDocuments(filter),
+      blogModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('createdBy', 'name email'),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return res.status(200).json({
+      userBlogs,
+      meta: {
+        totalItems,
+        totalPages,
+        page,
+        limit,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching user blogs:', error);
+    return res.status(500).json({ error: 'Failed to fetch blogs' });
+  }
+};
+
+export const deleteBlog = async (req, res) => {
+  const _id = req.params.id;
+  try {
+    await blogModel.deleteOne({
+      _id,
+    });
+    res.status(204).json({
+      message: 'Blog Deleted Successfully',
+    });
+  } catch (error) {
+    throw new Error('Internal server error');
   }
 };

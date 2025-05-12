@@ -1,37 +1,25 @@
 import mongoose, { model } from 'mongoose';
 
-const story = new mongoose.Schema(
+const user = new mongoose.Schema(
   {
-    category: {
+    name: {
       type: String,
       required: true,
       index: true,
     },
-    duration: {
+    email: {
       type: String,
       required: true,
     },
-    story: {
+    googleId: {
       type: String,
       required: true,
     },
-    description: {
-      type: String,
-      required: true,
-    },
-    timeUnit: {
-      type: String,
-      required: true,
-    },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      index: true, // also indexed for faster lookups by creator
-    },
+    subscription: {},
   },
   { timestamps: true }
 );
 
-story.index({ title: 1, createdBy: 1 });
+user.index({ title: 1, createdBy: 1 });
 
-export default model('Story', story);
+export default model('User', user);

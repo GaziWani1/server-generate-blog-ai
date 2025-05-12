@@ -2,34 +2,39 @@ import mongoose from 'mongoose';
 
 const { Schema, model, models } = mongoose;
 
-const storySchema = new Schema(
+const blogSchema = new Schema(
   {
     title: {
       type: String,
       required: true,
     },
-    duration: {
+    readingTime: {
       type: String,
       required: true,
     },
-    story: {
+    blog: {
       type: String,
       required: true,
     },
-    description: {
+    category: {
       type: String,
       required: true,
+    },
+    likes: {
+      type: Number,
+      default: 0,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       index: true,
+      required: true,
     },
   },
   { timestamps: true }
 );
 
 // Add full-text index for search
-storySchema.index({ title: 'text', story: 'text', description: 'text' });
+blogSchema.index({ title: 'text', blog: 'text' });
 
-export default models.Story || model('Story', storySchema);
+export default model('blog', blogSchema);
