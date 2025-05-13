@@ -20,25 +20,9 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const numCPUs = availableParallelism();
-
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/blog', storyRouter);
 
-app.use(errorMiddleware);
-if (cluster.isPrimary) {
-  console.log(`Primary ${process.pid} is running`);
-
-  // Fork workers.
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
-
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`worker ${worker.process.pid} died`);
-  });
-} else {
-  app.listen(PORT, () => {
-    console.log(`App is Running on Port http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`App is Running on Port http://localhost:${PORT}`);
+});
