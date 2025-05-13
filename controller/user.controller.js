@@ -38,3 +38,12 @@ export const signIn = async (req, res, next) => {
     next(error);
   }
 };
+
+export const credits = async (req, res, next) => {
+  try {
+    const credit = await userModel.findById(req.user._id).select('credits');
+    return res.status(200).json(credit);
+  } catch (error) {
+    next(error);
+  }
+};

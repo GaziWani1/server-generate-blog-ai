@@ -30,6 +30,12 @@ const blogSchema = new Schema(
       index: true,
       required: true,
     },
+    likedBy: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -16,6 +16,10 @@ const user = new mongoose.Schema(
       required: true,
     },
     subscription: {},
+    credits: {
+      type: Number,
+      default: 12,
+    },
   },
   { timestamps: true }
 );
