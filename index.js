@@ -7,6 +7,7 @@ import { availableParallelism } from 'node:os';
 import cors from 'cors';
 import userRouter from './route/user.route.js';
 import storyRouter from './route/storeis.route.js';
+import './jobs/renewCred.js';
 const app = express();
 
 connectDb();
