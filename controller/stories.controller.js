@@ -10,12 +10,6 @@ export const createBlog = async (req, res, next) => {
   try {
     const { blogType, readingTime, blogAbout, timeUnit } = req.body;
 
-    if (readingTime > 15 && timeUnit === 'minute') {
-      throw new Error(
-        'Blog Reading Time Should Be Only for 15 Minutes Or Less'
-      );
-    }
-
     const user = await userModel.findById(req.user._id);
 
     if (user.credits < 3) {
@@ -33,7 +27,7 @@ export const createBlog = async (req, res, next) => {
 
     let prompt = `Write a detailed, well-structured, and engaging ${blogType} blog post titled "${blogAbout}". The content should be formatted in Markdown using a README-style layout, with clear sections, headings (e.g., #, ##, ###), bullet points, blockquotes, bold/italic highlights, and to ensure readability.
 
-The blog should take approximately ${readingTime} ${timeUnit} to read. Start with a compelling title and a concise description, followed by a strong introduction. Then break the main body into logically organized sections with subheadings. Each section should have for readability, and include highlights like:
+The blog should take approximately ${1} ${timeUnit} to read. Start with a compelling title and a concise description, followed by a strong introduction. Then break the main body into logically organized sections with subheadings. Each section should have for readability, and include highlights like:
 - Lists for key points
 - Quotes for emphasis
 - Bold/italic for important terms
@@ -65,7 +59,8 @@ End with a thoughtful and inspiring conclusion. Use line breaks between each maj
       message: 'Blog Generated Successfully!',
     });
   } catch (error) {
-    next(error);
+    console.error('Error fetching user blogs:', error.message);
+    return res.status(500).json({ error: error.message });
   }
 };
 
