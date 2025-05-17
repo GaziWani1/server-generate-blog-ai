@@ -8,10 +8,6 @@ const subscriptionSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    stripeCustomerId: {
-      type: String,
-      required: true,
-    },
     stripeSubscriptionId: {
       type: String,
       required: true,
@@ -22,7 +18,7 @@ const subscriptionSchema = new mongoose.Schema(
     },
     plan: {
       type: String,
-      enum: ['basic', 'pro'],
+      enum: ['Basic', 'Pro'],
       required: true,
     },
     currentPeriodStart: {

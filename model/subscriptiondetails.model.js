@@ -11,4 +11,6 @@ const subscriptiondetail = new Schema({
   created: { type: Number },
 });
 
+subscriptiondetail.index({ id: 1 });
+
 export default model('subscriptiondetail', subscriptiondetail);
