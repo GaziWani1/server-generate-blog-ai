@@ -6,7 +6,7 @@ import userModel from '../model/user.model.js';
 export const genAI = new GoogleGenerativeAI(API_KEY);
 export const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-export const createBlog = async (req, res, next) => {
+export const createBlog = async (req, res) => {
   try {
     const { blogType, readingTime, blogAbout, timeUnit } = req.body;
 
@@ -106,7 +106,6 @@ export const getUserBlogs = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching user blogs:', error);
     return res.status(500).json({ error: 'Failed to fetch blogs' });
   }
 };
