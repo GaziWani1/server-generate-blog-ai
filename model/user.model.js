@@ -1,6 +1,7 @@
-import mongoose, { model } from 'mongoose';
+// models/User.js
+import mongoose from 'mongoose';
 
-const user = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -10,20 +11,28 @@ const user = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
     googleId: {
       type: String,
       required: true,
+      unique: true,
     },
-    subscription: {},
+    subscription: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Subscription',
+    },
     credits: {
       type: Number,
       default: 12,
+      min: 0,
     },
   },
   { timestamps: true }
 );
 
-user.index({ title: 1, createdBy: 1 });
+userSchema.index({ email: 1, googleId: 1 });
 
-export default model('User', user);
+export default mongoose.model('User', userSchema);
