@@ -7,9 +7,9 @@ import { PORT, STRIPE_SECRET_KEY } from './config/env.js';
 import cors from 'cors';
 import userRouter from './route/user.route.js';
 import storyRouter from './route/storeis.route.js';
-import './jobs/renewCred.js';
 
 import subscriptionRouter from './route/subscription.route.js';
+import { $ } from './jobs/subscriptionReminder.js';
 
 const app = express();
 
@@ -27,6 +27,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/blog', storyRouter);
 app.use('/api/v1/subscription', subscriptionRouter);
+
+app.use('/api/v1/subscription-reminder', $);
 
 app.listen(PORT, () => {
   console.log(`App is Running on Port http://localhost:${PORT}`);

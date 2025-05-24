@@ -61,19 +61,19 @@ export const subscription = async (req, res) => {
       status: 'active',
     });
 
+    await subscription.save();
+
     const user = await userModel.findById(req.user._id);
 
     if (subscriptionData.name === 'Pro' && session.id) {
       user.credits += 180;
-      user.subscription = subscriptionData._id;
+      user.subscription = subscription._id;
     } else if (subscriptionData.name === 'Basic' && session.id) {
       user.credits += 69;
-      user.subscription = subscriptionData._id;
+      user.subscription = subscription._id;
     }
 
     await user.save();
-
-    await subscription.save();
 
     return res.status(200).json({ url: session.url });
   } catch (error) {

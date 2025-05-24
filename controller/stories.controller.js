@@ -32,7 +32,7 @@ The blog should take approximately ${1} ${timeUnit} to read. Start with a compel
 - Quotes for emphasis
 - Bold/italic for important terms
 
-End with a thoughtful and inspiring conclusion. Use line breaks between each major section and paragraph. The tone should be professional yet friendly, avoiding technical jargon unless necessary, and keeping it accessible for a broad audience. Prioritize clarity, creativity, and usefulness. don't include 'markdown' word in starting or any other place`;
+End with a thoughtful and inspiring conclusion. Use line breaks between each major section and paragraph. The tone should be professional yet friendly, avoiding technical jargon unless necessary, and keeping it accessible for a broad audience. Prioritize clarity, creativity, and usefulness.`;
 
     // Generate the blog content using the model
     const result = await model.generateContent(prompt);
